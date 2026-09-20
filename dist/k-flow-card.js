@@ -1117,7 +1117,28 @@ class KFlowCard extends HTMLElement {
         <div class="pvi"><div class="ico">📤</div><div class="lbl">Poslano u mrežu</div><div class="val" id="monthExport">-- kWh</div></div>
         <div class="pvi"><div class="ico">📥</div><div class="lbl">Uzeto iz mreže</div><div class="val" id="monthImport">-- kWh</div></div>
       </div>
+      <div class="dv"></div>
+      <div class="ct" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Godina</span>
+        <span id="yearToggleBtn" style="cursor:pointer;font-size:1rem;font-weight:700;padding:0 8px;user-select:none">+</span>
+      </div>
+      <div class="pvf" id="yearSection" style="display:none">
+        <div class="pvi"><div class="ico">☀️</div><div class="lbl">Proizvodnja</div><div class="val yw" id="yearPv">-- kWh</div></div>
+        <div class="pvi"><div class="ico">🏡</div><div class="lbl">Potrošnja</div><div class="val" id="yearLoad">-- kWh</div></div>
+        <div class="pvi"><div class="ico">📤</div><div class="lbl">Poslano u mrežu</div><div class="val" id="yearExport">-- kWh</div></div>
+        <div class="pvi"><div class="ico">📥</div><div class="lbl">Uzeto iz mreže</div><div class="val" id="yearImport">-- kWh</div></div>
+      </div>
     </div>`;
+
+    const _yearToggle = this.shadowRoot.getElementById('yearToggleBtn');
+    const _yearSection = this.shadowRoot.getElementById('yearSection');
+    if (_yearToggle && _yearSection) {
+      _yearToggle.addEventListener('click', () => {
+        const hidden = _yearSection.style.display === 'none';
+        _yearSection.style.display = hidden ? 'grid' : 'none';
+        _yearToggle.textContent = hidden ? '−' : '+';
+      });
+    }
   }
 
   _updateDynamic() {
@@ -1408,6 +1429,15 @@ class KFlowCard extends HTMLElement {
     setText('monthLoad', _monthLoad !== null ? _monthLoad.toFixed(2) + ' kWh' : '-- kWh');
     setText('monthExport', _monthExport !== null ? _monthExport.toFixed(2) + ' kWh' : '-- kWh');
     setText('monthImport', _monthImport !== null ? _monthImport.toFixed(2) + ' kWh' : '-- kWh');
+
+    const _yearPv = this._val(this.config.year_pv_entity);
+    const _yearLoad = this._val(this.config.year_load_entity);
+    const _yearExport = this._val(this.config.year_export_entity);
+    const _yearImport = this._val(this.config.year_import_entity);
+    setText('yearPv', _yearPv !== null ? _yearPv.toFixed(2) + ' kWh' : '-- kWh');
+    setText('yearLoad', _yearLoad !== null ? _yearLoad.toFixed(2) + ' kWh' : '-- kWh');
+    setText('yearExport', _yearExport !== null ? _yearExport.toFixed(2) + ' kWh' : '-- kWh');
+    setText('yearImport', _yearImport !== null ? _yearImport.toFixed(2) + ' kWh' : '-- kWh');
 
     const _fmtHM = (v) => { if (!v) return '--:--'; const d = new Date(v); return isNaN(d.getTime()) ? '--:--' : String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
     setText('prodStart', _fmtHM(this._strVal(this.config.production_start_entity)));
