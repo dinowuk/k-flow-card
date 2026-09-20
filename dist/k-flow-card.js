@@ -1081,9 +1081,9 @@ class KFlowCard extends HTMLElement {
       <text id="invTempFlow" x="260" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#58a6ff">-- °C</text>
       <text id="invLoadPctFlow" x="260" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#3ce878">--%</text>
 
-      <text id="pv1label" x="8" y="360" font-size="9" fill="#8b949e" letter-spacing="1">PV1</text>
+      <text id="pv1label" x="8" y="360" font-size="9" fill="#8b949e" letter-spacing="1">Istok</text>
       <text id="pv1FlowVal" x="8" y="374" font-size="12" font-weight="700" fill="#ffe83c">-- W</text>
-      <text id="pv2label" x="8" y="392" font-size="9" fill="#8b949e" letter-spacing="1">PV2</text>
+      <text id="pv2label" x="8" y="392" font-size="9" fill="#8b949e" letter-spacing="1">Zapad</text>
       <text id="pv2FlowVal" x="8" y="406" font-size="12" font-weight="700" fill="#ffe83c">-- W</text>
       ${pv3txt}
       ${pv4txt}
