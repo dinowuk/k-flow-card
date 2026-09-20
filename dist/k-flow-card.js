@@ -1096,7 +1096,6 @@ class KFlowCard extends HTMLElement {
 
       `<div style="display:flex;gap:8px;align-items:center;margin-top:10px">
         <div style="flex:1;display:flex;align-items:center;gap:4px"><span style="font-size:.42rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase">PV</span><div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:10px" id="pvBlocks"></div></div>
-        <div style="flex:1;display:flex;align-items:center;gap:4px"><span style="font-size:.42rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase">Pwr</span><div style="flex:1;background:#21262d;border-radius:20px;height:9px;overflow:hidden;position:relative"><div id="pwrBar" style="position:absolute;inset:0;right:auto;width:0%;border-radius:20px;background:#3fb950;transition:width .4s,background .4s"></div></div></div>
       </div>
       <div class="dv"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:5px">
