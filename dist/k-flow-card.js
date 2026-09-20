@@ -1109,6 +1109,14 @@ class KFlowCard extends HTMLElement {
         
         <div class="pvi"><div class="ico">🏡</div><div class="lbl">Današnja potrošnja</div><div class="val" id="invTodayLoad">-- kWh</div></div>
       </div>
+      <div class="dv"></div>
+      <div class="ct">Mjesec</div>
+      <div class="pvf">
+        <div class="pvi"><div class="ico">☀️</div><div class="lbl">Proizvodnja</div><div class="val yw" id="monthPv">-- kWh</div></div>
+        <div class="pvi"><div class="ico">🏡</div><div class="lbl">Potrošnja</div><div class="val" id="monthLoad">-- kWh</div></div>
+        <div class="pvi"><div class="ico">📤</div><div class="lbl">Poslano u mrežu</div><div class="val" id="monthExport">-- kWh</div></div>
+        <div class="pvi"><div class="ico">📥</div><div class="lbl">Uzeto iz mreže</div><div class="val" id="monthImport">-- kWh</div></div>
+      </div>
     </div>`;
   }
 
@@ -1391,6 +1399,15 @@ class KFlowCard extends HTMLElement {
     setText('invTodayBattChg', _todayBattChgRaw !== null ? todayBattChg.toFixed(2) + ' kWh' : '-- kWh');
     setText('invTodayBattDis', battDis1Raw      !== null ? battDis1.toFixed(2)     + ' kWh' : '-- kWh');
     setText('invTodayLoad',    _todayLoadRaw    !== null ? todayLoad.toFixed(2)    + ' kWh' : '-- kWh');
+
+    const _monthPv = this._val(this.config.month_pv_entity);
+    const _monthLoad = this._val(this.config.month_load_entity);
+    const _monthExport = this._val(this.config.month_export_entity);
+    const _monthImport = this._val(this.config.month_import_entity);
+    setText('monthPv', _monthPv !== null ? _monthPv.toFixed(2) + ' kWh' : '-- kWh');
+    setText('monthLoad', _monthLoad !== null ? _monthLoad.toFixed(2) + ' kWh' : '-- kWh');
+    setText('monthExport', _monthExport !== null ? _monthExport.toFixed(2) + ' kWh' : '-- kWh');
+    setText('monthImport', _monthImport !== null ? _monthImport.toFixed(2) + ' kWh' : '-- kWh');
 
     const _fmtHM = (v) => { if (!v) return '--:--'; const d = new Date(v); return isNaN(d.getTime()) ? '--:--' : String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
     setText('prodStart', _fmtHM(this._strVal(this.config.production_start_entity)));
