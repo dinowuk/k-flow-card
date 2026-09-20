@@ -1,22 +1,37 @@
-# k-flow-card
+# k-flow-card (dinowuk edition)
 
-**Khan Automation — Home Assistant Custom Energy Flow Card**
-`k-flow-card.js` · Unified Edition  fixed some minor issues **V1.1.2**
-<img width="1708" height="2520" alt="IMG_20260513_114249" src="https://github.com/user-attachments/assets/e4c54570-5b9e-43c4-9326-b44d4105a5d1" />
-<img width="1108" height="1688" alt="IMG_20260516_011350" src="https://github.com/user-attachments/assets/6914d4ab-daa6-432a-983d-6abac15a1cac" />
-<img width="1114" height="1744" alt="IMG_20260516_011300" src="https://github.com/user-attachments/assets/ce97703f-ed71-4ab9-a79d-8d7cf3bcd3f6" />
+**Animated Home Assistant energy-flow card — fork of [thekhan1122/k-flow-card](https://github.com/thekhan1122/k-flow-card) by Khan Automation, extended and maintained by [dinowuk](https://github.com/dinowuk).**
+
+This fork keeps 100% of the original's features (battery, EV, dual-battery, extra PV strings, full visual editor) and adds a set of new, fully optional, fully configurable extras aimed at solar-only (no battery) setups and multi-language dashboards — while staying completely backward compatible with the original config.
+
+<img width="1708" height="2520" alt="k-flow-card" src="https://github.com/user-attachments/assets/e4c54570-5b9e-43c4-9326-b44d4105a5d1" />
+<img width="1108" height="1688" alt="k-flow-card" src="https://github.com/user-attachments/assets/6914d4ab-daa6-432a-983d-6abac15a1cac" />
+<img width="1114" height="1744" alt="k-flow-card" src="https://github.com/user-attachments/assets/ce97703f-ed71-4ab9-a79d-8d7cf3bcd3f6" />
 
 ---
 
 ## Overview
 
-`k-flow-card` is a fully custom Home Assistant Lovelace card that renders a live, animated energy-flow diagram for a GoodWe solar inverter system with JK BMS battery storage. It is self-contained in a single JavaScript file — no dependencies, no HACS card required beyond loading the resource.
+`k-flow-card` is a fully custom Home Assistant Lovelace card that renders a live, animated energy-flow diagram for a solar inverter system, with optional battery storage and EV charger. It is self-contained in a single JavaScript file — no dependencies, no other HACS card required beyond loading the resource.
 
-The card combines an SVG energy-flow canvas (sun arc, animated flow paths, inverter, battery, grid, home, EV nodes) with an HTML stat panel showing real-time battery telemetry. Everything updates live via the standard `hass` setter.
+The card combines an SVG energy-flow canvas (sun arc, animated flow paths, inverter, battery, grid, home, EV nodes) with an HTML stat panel showing real-time telemetry. Everything updates live via the standard `hass` setter.
 
 ---
 
-## Features
+## What's new in this fork
+
+Everything below is **off by default** and fully backward compatible — existing configs from the original card work unchanged.
+
+- **Editable text labels** — card title, PV string 1/2 labels, home/load label, battery power-bar label, charge/discharge tile label, remaining-capacity tile label, and the three battery status words (idle / charging / discharging), plus the "Till" ETA prefix. All editable straight in the visual editor, no YAML needed. Handy for translating the card into any language.
+- **Production Start / End Times** *(new optional section, toggle in editor)* — shows the time the inverter's first and most recent production crossing of the day happened, driven by two `timestamp` entities you point at (e.g. two small trigger-based template sensors in Home Assistant).
+- **Month / Year Summary** *(new optional section, toggle in editor)* — a collapsible block showing monthly and yearly totals for PV production, home consumption, grid export and grid import, each pointed at your own entities (e.g. `utility_meter` helpers with `cycle: monthly` / `cycle: yearly`).
+- **Battery section bug fix** — in the original, the six battery stat tiles (Cell Temp, BMS Temp, Min/Max Cell, Batt Discharge, Total PV Gen) and the Endurance tile were always rendered regardless of the `_show_battery` toggle. They're now correctly hidden when `_show_battery: false`, so solar-only installs get a clean card with zero battery clutter.
+
+See [Configuration Reference](#configuration-reference) below for the full list of new keys.
+
+---
+
+## Features (inherited from upstream)
 
 - Animated S-curve energy flow paths (solar → inverter → battery / grid / home / EV)
 - Live sun position tracking along an arc based on `sun.sun` elevation
@@ -25,10 +40,8 @@ The card combines an SVG energy-flow canvas (sun arc, animated flow paths, inver
 - EV / car charger node with live state, SOC, and ETA
 - Extra PV strings (PV3 / PV4) with combined toggle
 - System limits panel (battery Ah/Wh, inverter max, PV max)
-- Battery stat tiles: Cell Temp, BMS Temp, Min/Max Cell Voltage, Batt Discharge, Total PV Gen
-- Endurance tile: charge/discharge time remaining or ETA timestamp
 - Full visual editor with section toggles — no YAML required for setup
-- Per-row custom label and entity overrides for all 6 stat tiles
+- Per-row custom label and entity overrides for all 6 battery stat tiles
 - Fully dark-themed, mobile-friendly
 
 ---
@@ -38,14 +51,13 @@ The card combines an SVG energy-flow canvas (sun arc, animated flow paths, inver
 ### Method 1 — HACS (Recommended)
 
 1. In HACS, go to **Frontend → ⋮ → Custom repositories**
-2. Paste: `https://github.com/thekhan1122/k-flow-card` (without `.git`)
+2. Paste: `https://github.com/dinowuk/k-flow-card` (without `.git`)
 3. Category: **Lovelace**
-4. Install the card – the resource is added automatically.
-5. Click the **+ Explore & Download Repositories** button.
-6. Search for **k-flow-card**.
-7. Click **Download** the resource is added automatically.
-8. **Hard refresh** your browser (`Ctrl + Shift + R` / `Cmd + Shift + R`).
-9. Open the visual editor to configure entities.
+4. Click the **+ Explore & Download Repositories** button.
+5. Search for **k-flow-card**.
+6. Click **Download** — the resource is added automatically.
+7. **Hard refresh** your browser (`Ctrl + Shift + R` / `Cmd + Shift + R`).
+8. Open the visual editor to configure entities.
 
 > HACS handles resource registration automatically. No manual resource entry needed.
 
@@ -77,6 +89,38 @@ The card combines an SVG energy-flow canvas (sun arc, animated flow paths, inver
 ## Configuration Reference
 
 All keys are configured through the visual editor. The YAML equivalents are listed below for reference or manual setup.
+
+### New in this fork
+
+| Key | Default | Description |
+|---|---|---|
+| `card_title` | `Energy Flow` | Card header title |
+| `pv1_label` | `PV1` | PV string 1 label (SVG) |
+| `pv2_label` | `PV2` | PV string 2 label (SVG) |
+| `home_label` | `Home` | Home/load label (SVG, near house node) |
+| `label_pwr` | `Pwr` | Battery power-bar label |
+| `label_chg_dis` | `Chg / Dis` | Inverter row "Chg/Dis" tile label |
+| `label_remaining` | `Remaining` | Inverter row "Remaining" tile label |
+| `label_idle` | `IDLE` | Battery status badge — idle |
+| `label_charging` | `CHG` | Battery status badge — charging |
+| `label_discharging` | `DISCHG` | Battery status badge — discharging |
+| `label_till_prefix` | `Till` | Prefix for the endurance ETA timestamp |
+| `_show_production_times` | `false` | Toggle the Production Start/End Times section |
+| `production_start_label` | `Start` | Label for the start tile |
+| `production_end_label` | `End` | Label for the end tile |
+| `production_start_entity` | `''` | `timestamp` entity — first production crossing today |
+| `production_end_entity` | `''` | `timestamp` entity — most recent production crossing today |
+| `_show_month_year` | `false` | Toggle the Month/Year Summary section |
+| `month_pv_entity` | `''` | Monthly PV production (kWh) |
+| `month_load_entity` | `''` | Monthly load consumption (kWh) |
+| `month_export_entity` | `''` | Monthly grid export (kWh) |
+| `month_import_entity` | `''` | Monthly grid import (kWh) |
+| `year_pv_entity` | `''` | Yearly PV production (kWh) |
+| `year_load_entity` | `''` | Yearly load consumption (kWh) |
+| `year_export_entity` | `''` | Yearly grid export (kWh) |
+| `year_import_entity` | `''` | Yearly grid import (kWh) |
+
+> Tip: `production_start_entity` / `production_end_entity` and the month/year entities are meant to be fed by your own Home Assistant helpers — see the "Recipes" section below for a ready-to-use `configuration.yaml` snippet.
 
 ### Core / Solar
 
@@ -111,7 +155,7 @@ All keys are configured through the visual editor. The YAML equivalents are list
 
 | Key | Default | Description |
 |---|---|---|
-| `_show_battery` | `true` | Show primary battery section |
+| `_show_battery` | `true` | Show primary battery section (icon, Pwr bar, stat tiles, endurance, Chg/Dis + Remaining tiles) |
 | `battery_soc` | `sensor.jk_soc` | Battery state of charge (%) |
 | `battery_power` | `sensor.jk_power` | Battery power (W) |
 | `battery_current` | `sensor.jk_current` | Battery current (A) |
@@ -127,6 +171,8 @@ All keys are configured through the visual editor. The YAML equivalents are list
 | `goodwe_battery_soc` | `sensor.goodwe_battery_state_of_charge` | Fallback SOC |
 | `goodwe_battery_curr` | `sensor.goodwe_battery_current` | Fallback current |
 | `invert_battery_power` | `false` | Invert sign — enable if positive = discharging |
+
+> **No battery?** Set `_show_battery: false` (uncheck "Primary Battery" in the editor) and the Pwr bar, status badge, all six stat tiles, the Endurance tile, and the Chg/Dis + Remaining inverter-row tiles all disappear — the card reflows to a clean 2-column inverter row automatically.
 
 ### Secondary Battery
 
@@ -158,7 +204,7 @@ All keys are configured through the visual editor. The YAML equivalents are list
 | `_show_limits` | `false` | Show limits section (chip toggle) |
 | `inverter_max_power` | `6000` | Inverter max power for bar scaling (W) |
 
-### Labels
+### Labels (custom entity overrides for battery stat tiles)
 
 | Key | Default | Description |
 |---|---|---|
@@ -179,20 +225,91 @@ All keys are configured through the visual editor. The YAML equivalents are list
 
 ---
 
+## Recipes
+
+### Monthly / yearly totals from a power sensor (for the Month/Year Summary section)
+
+If you only have instantaneous power sensors (W) for grid import/export and load, you can derive monthly/yearly kWh totals with two built-in Home Assistant helpers — no extra integration needed:
+
+```yaml
+sensor:
+  - platform: integration
+    source: sensor.my_grid_export_power   # W
+    name: "Grid Export Energy"
+    unique_id: grid_export_energy
+    unit_prefix: k
+    round: 3
+    method: left
+
+utility_meter:
+  my_month_grid_export:
+    source: sensor.grid_export_energy
+    cycle: monthly
+  my_year_grid_export:
+    source: sensor.grid_export_energy
+    cycle: yearly
+```
+
+Repeat the same pattern (integration → utility_meter with `cycle: monthly` / `cycle: yearly`) for PV production and load consumption, then point the card's `month_*_entity` / `year_*_entity` fields at the resulting `utility_meter` sensors.
+
+### Production start / end timestamps
+
+```yaml
+template:
+  - trigger:
+      - trigger: numeric_state
+        entity_id: sensor.my_pv_power
+        above: 10
+      - trigger: time
+        at: "00:00:00"
+    sensor:
+      - name: "Production Start"
+        unique_id: production_start
+        device_class: timestamp
+        state: >
+          {% if trigger.platform == 'time' %}
+            {{ none }}
+          {% else %}
+            {{ now() }}
+          {% endif %}
+  - trigger:
+      - trigger: numeric_state
+        entity_id: sensor.my_pv_power
+        below: 10
+      - trigger: time
+        at: "00:00:00"
+    sensor:
+      - name: "Production End"
+        unique_id: production_end
+        device_class: timestamp
+        state: >
+          {% if trigger.platform == 'time' %}
+            {{ none }}
+          {% else %}
+            {{ now() }}
+          {% endif %}
+```
+
+Point `production_start_entity` / `production_end_entity` at `sensor.production_start` / `sensor.production_end`.
+
+---
+
 ## Visual Editor Sections
 
 | Section | Toggle | Description |
 |---|---|---|
-| General | — | Inverter name |
+| General | — | Inverter name, card title, PV/home labels |
 | Labels | `+ Enable` chip | Rename stat tiles; per-row entity overrides |
 | Solar | — | PV1, PV2 entities |
 | Extra PV Strings | `+ Enable` chip | PV3, PV4 |
 | Solar Extras | — | Totals, temperatures, today stats |
 | Grid | — | Grid power, import/export, consumption |
-| Primary Battery | `+ Enable` chip | Full BMS telemetry |
+| Primary Battery | `+ Enable` chip | Full BMS telemetry, Pwr bar, badge, and tile text overrides |
 | Secondary Battery | `+ Enable` chip | Second pack |
 | System Limits | `+ Enable` chip | Capacity and power limits |
 | EV / Car Charger | `+ Enable` chip | Charger state, SOC, ETA |
+| Production Start/End Times | `+ Enable` chip | *(new)* Timestamps for first/last production crossing today |
+| Month / Year Summary | `+ Enable` chip | *(new)* Monthly and yearly PV/load/grid totals |
 
 ---
 
@@ -204,67 +321,6 @@ All keys are configured through the visual editor. The YAML equivalents are list
 | **Cell Temp** | ≤15°C blue · ≤35°C green · ≤45°C orange · >45°C red |
 | **Cell Voltage** | <3.0V red · <3.1V orange · <3.4V yellow · ≤3.65V green · >3.65V red |
 | **Inverter / Env Temp** | ≤25°C green · ≤45°C orange · >45°C red |
-
----
-
-## Changelog
-
-### v7.4.0
-- **Labels section — header chip toggle** (same style as Secondary Battery, Extra PV, EV, Limits sections). Body is hidden when disabled.
-- **Per-row auto-enable logic:** each label row's entity picker activates independently — only when that row's text has been changed from its default value. No global unlock needed.
-- **Per-row Battery/Solar locking:** corresponding pickers in Battery and Solar Extras sections lock individually when their label row is active, not all-at-once.
-- `_updateDynamic` refactored: dead `_readEntity` helper removed; replaced with clean `_rowActive`, `_readNum`, `_readStr` helpers.
-- `_set` now triggers a re-render on any of the 6 label text key changes (live editor feedback).
-
-### v7.3.0
-- **Labels editor** reduced to exactly 6 rows matching the 2×3 stat tile grid.
-- `label_endurance` text field removed from editor (endurance tile exists on card but label is fixed).
-- `label_endu_eta` / `label_entity_endu_eta` row removed from editor.
-- **Battery voltage** (`battery_voltage`, `battery2_voltage`) is never locked — always freely editable regardless of Labels state.
-- **Cell Temp override:** when a custom entity is selected, tile shows a single value only (no `temp1 / temp2` pair).
-- **Endurance tile** layout: full card width, vertically compact row, all content bottom-aligned (`align-items:flex-end`).
-- Dead stub config keys purged: `label_endu_eta`, `label_entity_endu_eta`, `label_entity_cell_temp2`, `label_entity_endurance`.
-
-### v7.2.1
-- **Endurance tile** redesigned from narrow column to full-width single row (horizontally full, vertically compact).
-- **Cell Temp Min/Max** entity override: added second entity picker (`label_entity_cell_temp2`) to allow independent min/max overrides. *(Superseded in v7.3.0)*
-
-### v7.2.0
-- **Labels section** introduced with `switchRow` global toggle for custom entities.
-- Six stat tiles made label-customisable: Cell Temp Min/Max, BMS Temp, Min Cell, Max Cell, Batt Dis, Total PV Gen.
-- `pickerMaybeDisabled` helper added — renders override veil on Battery section pickers when Labels global toggle is ON.
-- Battery voltage pickers exempted from locking.
-- Info banner added above label rows.
-
-### v7.1.x
-- **Dual battery** support: Secondary Battery section with independent SOC, power, current, voltage, BMS temp.
-- Battery current and power values moved outside the battery icon SVG: power displayed above flow bar, current below.
-- Dual battery values stacked in stat tiles where applicable (e.g. `mos1 / mos2`).
-
-### v7.0.x
-- **EV / Car Charger** node added to SVG canvas with animated flow path, SOC arc, and ETA display.
-- `_show_ev` chip toggle added to editor.
-- Charger state machine: `charging`, `completed`, `finished`, `disconnected` with colour and icon changes.
-
-### v6.x
-- **Extra PV Strings** (PV3 + PV4) merged under one `_show_pv_extra` chip toggle (previously two separate toggles).
-- **System Limits** section added with numeric fields: battery Ah, battery Wh, inverter max, PV max.
-- `_show_limits` chip toggle added.
-- `inverter_name` moved to General section as `ha-textfield` input.
-- `charger_battery_capacity_wh` and other numeric fields migrated to explicit `ha-textfield` / `numberField` inputs.
-
-### v5.x
-- Sun arc introduced: sun SVG node tracks real elevation angle from `sun.sun`, stays pinned on the arc path.
-- Animated S-curve flow paths replacing straight lines.
-- Cross / T-shape layout established: sun arc at top → inverter centre → Battery left, Grid right, Home below.
-- Static SVG rebuilt via `_buildStaticSVG()` on `setConfig`; dynamic updates isolated to `_updateDynamic()`.
-
-### v4.x and earlier
-- Initial card structure: basic SVG energy flow with GoodWe + JK BMS entity mapping.
-- Visual editor scaffolded with `makeSection`, `picker`, `textField`, `switchRow` helpers.
-- `ha-selector` entity pickers introduced.
-- SOC colour logic, cell temp/voltage colour helpers defined.
-- Endurance calculation introduced (hours remaining based on current draw / charge rate).
 
 ---
 
@@ -301,7 +357,6 @@ k-flow-card.js
 
 ## Notes
 
-- Tested on Home Assistant OS (HAOS) with GoodWe ET/ES inverter integration and JK BMS Bluetooth integration.
 - The card uses shadow DOM — custom CSS from themes does not penetrate the card. All colours are hardcoded or driven by entity values.
 - Config keys prefixed with `_` (e.g. `_show_battery`) are editor-only boolean toggles — they control visibility but are stored in the card config YAML.
 - When installed via HACS, the resource is registered automatically. When installed manually, register as `type: module`.
@@ -331,7 +386,6 @@ k-flow-card.js
 
 - Open **Developer Tools → States** and confirm the entity ID exists and has a valid numeric state (not `unavailable` or `unknown`).
 - Entity IDs are case-sensitive. Check for typos in the editor.
-- If using GoodWe integration, ensure the inverter is online and the integration is polling correctly.
 - The card skips `unavailable` and `unknown` states by design — the tile will show `--` until the entity returns a valid value.
 
 ---
@@ -377,7 +431,7 @@ k-flow-card.js
 
 ### Reporting a bug
 
-When reporting an issue, include:
+Please open an issue on [this repo](https://github.com/dinowuk/k-flow-card/issues) with:
 - Home Assistant version
 - k-flow-card version (visible in browser DevTools console on load)
 - Browser console errors (screenshot or copy-paste)
@@ -385,4 +439,10 @@ When reporting an issue, include:
 
 ---
 
-*Khan Automation · k-flow-card · Last updated: v1.1.1*
+## Credits & License
+
+This is a fork of [thekhan1122/k-flow-card](https://github.com/thekhan1122/k-flow-card) ("Khan Automation"), which remains the original author of the base card, its animated SVG engine, and the visual editor framework. All credit for the original design and the vast majority of the code goes to them.
+
+This fork adds configurable labels, the Production Start/End Times section, the Month/Year Summary section, and a fix so the battery UI is correctly hidden end-to-end when `_show_battery: false`.
+
+Released under the MIT License — see [LICENSE](LICENSE).
