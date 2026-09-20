@@ -998,7 +998,7 @@ class KFlowCard extends HTMLElement {
       .dv{height:1px;background:#21262d;margin:8px 0}
       .ct{font-size:.56rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;margin-bottom:10px;display:flex;align-items:center;gap:7px}
       .ct::after{content:'';flex:1;height:1px;background:#21262d}
-      .pvf{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:2px}
+      .pvf{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-bottom:2px}
       .pvi{text-align:center;background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:6px 2px}
       .pvi .ico{font-size:.95rem;margin-bottom:2px}
       .pvi .lbl{font-size:.44rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
@@ -1105,8 +1105,8 @@ class KFlowCard extends HTMLElement {
       <div class="ct">☀️ Inverter</div>
       <div class="pvf">
         <div class="pvi"><div class="ico">☀️</div><div class="lbl">Današnja proizvodnja</div><div class="val yw" id="invTodayPv">-- kWh</div></div>
-        <div class="pvi"><div class="ico">🔋</div><div class="lbl">Chg / Dis</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
-        <div class="pvi"><div class="ico">⚡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
+        
+        
         <div class="pvi"><div class="ico">🏡</div><div class="lbl">Today Load</div><div class="val" id="invTodayLoad">-- kWh</div></div>
       </div>
     </div>`;
