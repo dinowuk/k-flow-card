@@ -1077,7 +1077,8 @@ class KFlowCard extends HTMLElement {
 
       <rect id="fcInvRect" x="205" y="155" width="110" height="110" rx="18" fill="#161b22" stroke="#f4a93b" stroke-width="4"/>
       <text id="invNameLabel" x="260" y="203" text-anchor="middle" font-size="14" font-weight="800" fill="#f4a93b" letter-spacing="1">INV</text>
-      <text id="invLoadPctFlow" x="260" y="228" text-anchor="middle" font-size="12" font-weight="700" fill="#3ce878">--%</text>
+      <text id="invTempFlow" x="260" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#58a6ff">-- °C</text>
+      <text id="invLoadPctFlow" x="260" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#3ce878">--%</text>
 
       <text id="pv1label" x="8" y="360" font-size="13" fill="#8b949e" letter-spacing="1">Istok</text>
       <text id="pv1FlowVal" x="8" y="374" font-size="16" font-weight="700" fill="#ffe83c">-- W</text>
@@ -1385,6 +1386,9 @@ class KFlowCard extends HTMLElement {
     const badge = getEl('battStatusBadge');
     if (badge) { badge.textContent = absPwr1 < 50 ? 'IDLE' : isCharging1 ? 'CHG' : 'DISCHG'; badge.style.color = absPwr1 < 50 ? '#8b949e' : isCharging1 ? '#00d7ff' : '#3ce878'; }
 
+    const _invTemp = this._val(this.config.inv_temp);
+    setText('invTempFlow', _invTemp !== null ? _invTemp.toFixed(1) + ' °C' : '-- °C');
+    setAttr('invTempFlow', 'fill', _invTemp === null ? '#8b949e' : _invTemp <= 45 ? '#58a6ff' : _invTemp <= 55 ? '#f39c4b' : '#f85149');
     setText('invNameLabel', this.config.inverter_name || 'INV');
     const invLoadPct = Math.min(load / invMax * 100, 100).toFixed(0);
     // Fix #8: toFixed() returns a string; use Number() for the colour comparison
