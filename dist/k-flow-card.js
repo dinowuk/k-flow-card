@@ -641,6 +641,14 @@ class KFlowCardEditor extends HTMLElement {
     shell.appendChild(makeSection('battery1', '🔋', 'Primary Battery', [
       switchRow('invert_battery_power', '🔄 Invert battery power sign', 'Enable if positive = discharging'),
       divider(),
+      textField('label_pwr', 'Power Bar Label', 'e.g. Pwr'),
+      textField('label_chg_dis', 'Chg/Dis Tile Label', 'e.g. Chg / Dis'),
+      textField('label_remaining', 'Remaining Tile Label', 'e.g. Remaining'),
+      textField('label_idle', 'Idle Status Label', 'e.g. IDLE'),
+      textField('label_charging', 'Charging Status Label', 'e.g. CHG'),
+      textField('label_discharging', 'Discharging Status Label', 'e.g. DISCHG'),
+      textField('label_till_prefix', 'ETA "Till" Prefix', 'e.g. Till'),
+      divider(),
       picker('battery_soc',      'Battery SOC'),
       picker('battery_power',    'Battery Power'),
       picker('battery_current',  'Battery Current'),
@@ -796,6 +804,13 @@ class KFlowCard extends HTMLElement {
       production_start_entity: '',
       production_end_entity: '',
       _show_month_year: false,
+      label_pwr: 'Pwr',
+      label_chg_dis: 'Chg / Dis',
+      label_remaining: 'Remaining',
+      label_idle: 'IDLE',
+      label_charging: 'CHG',
+      label_discharging: 'DISCHG',
+      label_till_prefix: 'Till',
       month_pv_entity: '',
       month_load_entity: '',
       month_export_entity: '',
@@ -852,12 +867,12 @@ class KFlowCard extends HTMLElement {
     // Fix #15: h > 0 guard was too strict — h approaching 0 from positive side
     // (battery at 0%, tiny charge power) returned 'Till --' despite a valid ETA.
     // Use h < 0 to reject only truly invalid/negative values.
-    if (!isFinite(h) || h < 0) return 'Till --';
+    if (!isFinite(h) || h < 0) return (this.config.label_till_prefix || 'Till') + ' --';
     const target = new Date(Date.now() + h * 3600000);
     const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][target.getDay()];
     let hr = target.getHours(); const ampm = hr >= 12 ? 'PM' : 'AM';
     hr = hr % 12 || 12;
-    return 'Till ' + day + ' ' + hr + ':' + target.getMinutes().toString().padStart(2,'0') + ' ' + ampm;
+    return (this.config.label_till_prefix || 'Till') + ' ' + day + ' ' + hr + ':' + target.getMinutes().toString().padStart(2,'0') + ' ' + ampm;
   }
 
   _sunData() {
@@ -1138,7 +1153,7 @@ class KFlowCard extends HTMLElement {
 
       `<div style="display:flex;gap:8px;align-items:center;margin-top:10px">
         <div style="flex:1;display:flex;align-items:center;gap:4px"><span style="font-size:.42rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase">PV</span><div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:10px" id="pvBlocks"></div></div>
-        ${this.config._show_battery ? '<div style="flex:1;display:flex;align-items:center;gap:4px"><span style="font-size:.42rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase">Pwr</span><div style="flex:1;background:#21262d;border-radius:20px;height:9px;overflow:hidden;position:relative"><div id="pwrBar" style="position:absolute;inset:0;right:auto;width:0%;border-radius:20px;background:#3fb950;transition:width .4s,background .4s"></div></div></div>' : ''}
+        ${this.config._show_battery ? `<div style="flex:1;display:flex;align-items:center;gap:4px"><span style="font-size:.42rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase">${this.config.label_pwr || 'Pwr'}</span><div style="flex:1;background:#21262d;border-radius:20px;height:9px;overflow:hidden;position:relative"><div id="pwrBar" style="position:absolute;inset:0;right:auto;width:0%;border-radius:20px;background:#3fb950;transition:width .4s,background .4s"></div></div></div>` : ''}
       </div>
       ${this.config._show_production_times ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px">
         <div class="st"><div class="l">${this.config.production_start_label || 'Start'}</div><div class="v" id="prodStart">--:--</div></div>
@@ -1168,8 +1183,8 @@ class KFlowCard extends HTMLElement {
       <div class="ct">☀️ Inverter</div>
       <div class="pvf" style="grid-template-columns:repeat(${this.config._show_battery ? 4 : 2},1fr)">
         <div class="pvi"><div class="ico">☀️</div><div class="lbl">Današnja proizvodnja</div><div class="val yw" id="invTodayPv">-- kWh</div></div>
-        ${this.config._show_battery ? '<div class="pvi"><div class="ico">🔋</div><div class="lbl">Chg / Dis</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>' : ''}
-        ${this.config._show_battery ? '<div class="pvi"><div class="ico">⚡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>' : ''}
+        ${this.config._show_battery ? `<div class="pvi"><div class="ico">🔋</div><div class="lbl">${this.config.label_chg_dis || 'Chg / Dis'}</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>` : ''}
+        ${this.config._show_battery ? `<div class="pvi"><div class="ico">⚡</div><div class="lbl">${this.config.label_remaining || 'Remaining'}</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>` : ''}
         <div class="pvi"><div class="ico">🏡</div><div class="lbl">Današnja potrošnja</div><div class="val" id="invTodayLoad">-- kWh</div></div>
       </div>
       ${this.config._show_month_year ? `<div class="dv"></div>
@@ -1448,7 +1463,7 @@ class KFlowCard extends HTMLElement {
         'linear-gradient(to right, #f4d03f, #f39c4b ' + ((absPwr1 / invMax * 100) * 0.5).toFixed(0) + '%, #f85149)';
     }
     const badge = getEl('battStatusBadge');
-    if (badge) { badge.textContent = absPwr1 < 50 ? 'IDLE' : isCharging1 ? 'CHG' : 'DISCHG'; badge.style.color = absPwr1 < 50 ? '#8b949e' : isCharging1 ? '#00d7ff' : '#3ce878'; }
+    if (badge) { badge.textContent = absPwr1 < 50 ? (this.config.label_idle || 'IDLE') : isCharging1 ? (this.config.label_charging || 'CHG') : (this.config.label_discharging || 'DISCHG'); badge.style.color = absPwr1 < 50 ? '#8b949e' : isCharging1 ? '#00d7ff' : '#3ce878'; }
 
     const _invTemp = this._val(this.config.inv_temp);
     setText('invTempFlow', _invTemp !== null ? _invTemp.toFixed(1) + ' °C' : '-- °C');
