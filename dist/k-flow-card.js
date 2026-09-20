@@ -135,6 +135,8 @@ class KFlowCardEditor extends HTMLElement {
     const showBatt2 = !!(cfg._show_battery2);
     const showPVExtra = !!(cfg._show_pv_extra);
     const showEV = !!(cfg._show_ev);
+    const showProdTimes = !!(cfg._show_production_times);
+    const showMonthYear = !!(cfg._show_month_year);
     const capUnit = cfg.battery_cap_unit || 'ah'; // 'ah' or 'kwh'
 
     const style = `
@@ -484,6 +486,10 @@ class KFlowCardEditor extends HTMLElement {
 
     shell.appendChild(makeSection('general', '⚙️', 'General', [
       textField('inverter_name', 'Inverter Name', 'e.g. My Inverter'),
+      textField('card_title', 'Card Title', 'e.g. Energy Flow'),
+      textField('pv1_label', 'PV String 1 Label', 'e.g. PV1'),
+      textField('pv2_label', 'PV String 2 Label', 'e.g. PV2'),
+      textField('home_label', 'Home/Load Label', 'e.g. Home'),
       divider(),
       capGroupWrap,
       divider(),
@@ -672,6 +678,25 @@ class KFlowCardEditor extends HTMLElement {
       numberField('charger_battery_capacity_wh', 'EV Battery Capacity', 0, 200000, 1, 'Wh'),
     ], { toggleKey: '_show_ev', toggleOn: showEV, hidden: !showEV }));
 
+    shell.appendChild(makeSection('production', '⏱️', 'Production Start/End Times', [
+      textField('production_start_label', 'Start Label', 'e.g. Start'),
+      textField('production_end_label', 'End Label', 'e.g. End'),
+      picker('production_start_entity', 'Production Start Entity (timestamp)'),
+      picker('production_end_entity', 'Production End Entity (timestamp)'),
+    ], { toggleKey: '_show_production_times', toggleOn: showProdTimes, hidden: !showProdTimes }));
+
+    shell.appendChild(makeSection('month_year', '📅', 'Month / Year Summary', [
+      picker('month_pv_entity', 'Month PV Production'),
+      picker('month_load_entity', 'Month Load Consumption'),
+      picker('month_export_entity', 'Month Grid Export'),
+      picker('month_import_entity', 'Month Grid Import'),
+      divider(),
+      picker('year_pv_entity', 'Year PV Production'),
+      picker('year_load_entity', 'Year Load Consumption'),
+      picker('year_export_entity', 'Year Grid Export'),
+      picker('year_import_entity', 'Year Grid Import'),
+    ], { toggleKey: '_show_month_year', toggleOn: showMonthYear, hidden: !showMonthYear }));
+
     this.innerHTML = '';
     this.appendChild(shell);
     this._rendered = true; // Fix #2: mark rendered so hass setter stops triggering full DOM rebuilds
@@ -761,6 +786,24 @@ class KFlowCard extends HTMLElement {
       invert_grid_power: false,
       _show_pv_extra: false,   // combined toggle
       _show_ev: false,
+      card_title: 'Energy Flow',
+      pv1_label: 'PV1',
+      pv2_label: 'PV2',
+      home_label: 'Home',
+      _show_production_times: false,
+      production_start_label: 'Start',
+      production_end_label: 'End',
+      production_start_entity: '',
+      production_end_entity: '',
+      _show_month_year: false,
+      month_pv_entity: '',
+      month_load_entity: '',
+      month_export_entity: '',
+      month_import_entity: '',
+      year_pv_entity: '',
+      year_load_entity: '',
+      year_export_entity: '',
+      year_import_entity: '',
     };
   }
 
@@ -1006,7 +1049,7 @@ class KFlowCard extends HTMLElement {
       .pvi .val.yw{color:#f4d03f} text{font-family:'Segoe UI',Arial,sans-serif}
     </style>
     <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;padding:13px;box-shadow:0 4px 20px rgba(0,0,0,.4);width:100%;box-sizing:border-box;">
-      <div class="ct">⚡ Sunčana elektrana</div>
+      <div class="ct">⚡ ${this.config.card_title || 'Energy Flow'}${this.config._show_battery ? ' <span id="battStatusBadge" style="margin-left:auto;font-size:.5rem;font-weight:700;letter-spacing:1.5px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">IDLE</span>' : ''}</div>
       <div style="width:100%;max-width:520px;margin:0 auto"><svg id="flowSvg" viewBox="0 0 520 470" style="width:100%;display:block">
       <defs>
         <filter id="arcSunF" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="7"/></filter>
@@ -1080,35 +1123,56 @@ class KFlowCard extends HTMLElement {
       <text id="invTempFlow" x="260" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#58a6ff">-- °C</text>
       <text id="invLoadPctFlow" x="260" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#3ce878">--%</text>
 
-      <text id="pv1label" x="8" y="360" font-size="13" fill="#8b949e" letter-spacing="1">Istok</text>
+      <text id="pv1label" x="8" y="360" font-size="13" fill="#8b949e" letter-spacing="1">${this.config.pv1_label || 'PV1'}</text>
       <text id="pv1FlowVal" x="8" y="374" font-size="16" font-weight="700" fill="#ffe83c">-- W</text>
-      <text id="pv2label" x="8" y="392" font-size="13" fill="#8b949e" letter-spacing="1">Zapad</text>
+      <text id="pv2label" x="8" y="392" font-size="13" fill="#8b949e" letter-spacing="1">${this.config.pv2_label || 'PV2'}</text>
       <text id="pv2FlowVal" x="8" y="406" font-size="16" font-weight="700" fill="#ffe83c">-- W</text>
       ${pv3txt}
       ${pv4txt}
 
       <g id="homeIconImg" transform="translate(179,339)" style="opacity:1"><image href="${iconPath}/home-icon.png" x="0" y="0" width="160" height="160" preserveAspectRatio="xMidYMid meet"/></g>
-      <text id="fcLoadLabel" x="174" y="405" text-anchor="end" font-size="12" fill="#8b949e" letter-spacing=".5">Potrošnja kuće</text>
+      <text id="fcLoadLabel" x="174" y="405" text-anchor="end" font-size="12" fill="#8b949e" letter-spacing=".5">${this.config.home_label || 'Home'}</text>
       <text id="fcLoadVal" x="174" y="420" text-anchor="end" font-size="17" font-weight="700" fill="#F7F6D3">-- W</text>
       ${evtxt}
       </svg></div>`+
 
       `<div style="display:flex;gap:8px;align-items:center;margin-top:10px">
         <div style="flex:1;display:flex;align-items:center;gap:4px"><span style="font-size:.42rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase">PV</span><div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:10px" id="pvBlocks"></div></div>
+        ${this.config._show_battery ? '<div style="flex:1;display:flex;align-items:center;gap:4px"><span style="font-size:.42rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase">Pwr</span><div style="flex:1;background:#21262d;border-radius:20px;height:9px;overflow:hidden;position:relative"><div id="pwrBar" style="position:absolute;inset:0;right:auto;width:0%;border-radius:20px;background:#3fb950;transition:width .4s,background .4s"></div></div></div>' : ''}
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px">
-        <div class="st"><div class="l">Početak proizvodnje</div><div class="v" id="prodStart">--:--</div></div>
-        <div class="st"><div class="l">Kraj proizvodnje</div><div class="v" id="prodEnd">--:--</div></div>
+      ${this.config._show_production_times ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px">
+        <div class="st"><div class="l">${this.config.production_start_label || 'Start'}</div><div class="v" id="prodStart">--:--</div></div>
+        <div class="st"><div class="l">${this.config.production_end_label || 'End'}</div><div class="v" id="prodEnd">--:--</div></div>
+      </div>` : ''}
+      ${this.config._show_battery ? `<div class="dv"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:5px">
+        <div class="st"><div class="l">${this.config.label_cell_temp_minmax || 'CELL TEMP MIN/MAX'}</div><div class="v" id="bTemp1">-- °C</div></div>
+        <div class="st"><div class="l">${this.config.label_bms_temp || 'BMS TEMP'}</div><div class="v" id="bTemp2">-- °C</div></div>
+        <div class="st"><div class="l">${this.config.label_total_pv_gen || 'TOTAL PV GEN.'}</div><div class="v" id="bTotalPvGen">-- kWh</div></div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:4px">
+        <div class="st"><div class="l">${this.config.label_min_cell || 'Min Cell'}</div><div class="v" id="bMinCell">-- V</div></div>
+        <div class="st"><div class="l">${this.config.label_max_cell || 'Max Cell'}</div><div class="v" id="bMaxCell">-- V</div></div>
+        <div class="st"><div class="l">${this.config.label_batt_dis || 'Batt Dis.'}</div><div class="v" id="bBattDis">-- kWh</div></div>
+      </div>
+      <div style="margin-top:4px">
+        <div class="st" style="display:flex;flex-direction:row;align-items:flex-end;justify-content:space-between;gap:8px;padding:4px 9px 5px;width:100%;box-sizing:border-box">
+          <div class="l" id="bEnduStatLbl" style="margin-bottom:0;white-space:nowrap;line-height:1.4">${this.config.label_endurance || 'ENDURANCE'}</div>
+          <div style="display:flex;align-items:flex-end;gap:10px;flex-shrink:0">
+            <div class="v" id="bEnduranceStat" style="font-size:.88rem;line-height:1.2">--</div>
+            <div id="bEnduranceTime" style="font-size:.58rem;color:#8b949e;letter-spacing:.3px;white-space:nowrap;line-height:1.4">Till --</div>
+          </div>
+        </div>
+      </div>` : ''}
       <div class="dv"></div>
       <div class="ct">☀️ Inverter</div>
-      <div class="pvf">
+      <div class="pvf" style="grid-template-columns:repeat(${this.config._show_battery ? 4 : 2},1fr)">
         <div class="pvi"><div class="ico">☀️</div><div class="lbl">Današnja proizvodnja</div><div class="val yw" id="invTodayPv">-- kWh</div></div>
-        
-        
+        ${this.config._show_battery ? '<div class="pvi"><div class="ico">🔋</div><div class="lbl">Chg / Dis</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>' : ''}
+        ${this.config._show_battery ? '<div class="pvi"><div class="ico">⚡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>' : ''}
         <div class="pvi"><div class="ico">🏡</div><div class="lbl">Današnja potrošnja</div><div class="val" id="invTodayLoad">-- kWh</div></div>
       </div>
-      <div class="dv"></div>
+      ${this.config._show_month_year ? `<div class="dv"></div>
       <div class="ct">Mjesec</div>
       <div class="pvf">
         <div class="pvi"><div class="ico">☀️</div><div class="lbl">Proizvodnja</div><div class="val yw" id="monthPv">-- kWh</div></div>
@@ -1126,7 +1190,7 @@ class KFlowCard extends HTMLElement {
         <div class="pvi"><div class="ico">🏡</div><div class="lbl">Potrošnja</div><div class="val" id="yearLoad">-- kWh</div></div>
         <div class="pvi"><div class="ico">📤</div><div class="lbl">Poslano u mrežu</div><div class="val" id="yearExport">-- kWh</div></div>
         <div class="pvi"><div class="ico">📥</div><div class="lbl">Uzeto iz mreže</div><div class="val" id="yearImport">-- kWh</div></div>
-      </div>
+      </div>` : ''}
     </div>`;
 
     const _yearToggle = this.shadowRoot.getElementById('yearToggleBtn');
