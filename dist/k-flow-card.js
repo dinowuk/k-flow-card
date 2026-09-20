@@ -993,16 +993,16 @@ class KFlowCard extends HTMLElement {
     this.shadowRoot.innerHTML = `<style>
       :host{display:block} @keyframes svgPulseOrange{0%,100%{filter:drop-shadow(0 0 5px #f39c4b)}50%{filter:drop-shadow(0 0 8px #f5b06a)}}
       .st{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:7px 9px}
-      .st .l{font-size:.62rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
-      .st .v{font-size:1rem;font-weight:600;color:#c9d1d9}
+      .st .l{font-size:.72rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+      .st .v{font-size:1.15rem;font-weight:600;color:#c9d1d9}
       .dv{height:1px;background:#21262d;margin:8px 0}
-      .ct{font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+      .ct{font-size:.85rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;margin-bottom:10px;display:flex;align-items:center;gap:7px}
       .ct::after{content:'';flex:1;height:1px;background:#21262d}
       .pvf{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-bottom:2px}
       .pvi{text-align:center;background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:6px 2px}
-      .pvi .ico{font-size:1.15rem;margin-bottom:2px}
-      .pvi .lbl{font-size:.58rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
-      .pvi .val{font-size:.98rem;font-weight:700;color:#c9d1d9}
+      .pvi .ico{font-size:1.35rem;margin-bottom:2px}
+      .pvi .lbl{font-size:.72rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+      .pvi .val{font-size:1.2rem;font-weight:700;color:#c9d1d9}
       .pvi .val.yw{color:#f4d03f} text{font-family:'Segoe UI',Arial,sans-serif}
     </style>
     <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;padding:13px;box-shadow:0 4px 20px rgba(0,0,0,.4);width:100%;box-sizing:border-box;">
@@ -1081,16 +1081,16 @@ class KFlowCard extends HTMLElement {
       <text id="invTempFlow" x="260" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#58a6ff">-- °C</text>
       <text id="invLoadPctFlow" x="260" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#3ce878">--%</text>
 
-      <text id="pv1label" x="8" y="360" font-size="11" fill="#8b949e" letter-spacing="1">Istok</text>
-      <text id="pv1FlowVal" x="8" y="374" font-size="14" font-weight="700" fill="#ffe83c">-- W</text>
-      <text id="pv2label" x="8" y="392" font-size="11" fill="#8b949e" letter-spacing="1">Zapad</text>
-      <text id="pv2FlowVal" x="8" y="406" font-size="14" font-weight="700" fill="#ffe83c">-- W</text>
+      <text id="pv1label" x="8" y="360" font-size="13" fill="#8b949e" letter-spacing="1">Istok</text>
+      <text id="pv1FlowVal" x="8" y="374" font-size="16" font-weight="700" fill="#ffe83c">-- W</text>
+      <text id="pv2label" x="8" y="392" font-size="13" fill="#8b949e" letter-spacing="1">Zapad</text>
+      <text id="pv2FlowVal" x="8" y="406" font-size="16" font-weight="700" fill="#ffe83c">-- W</text>
       ${pv3txt}
       ${pv4txt}
 
       <g id="homeIconImg" transform="translate(179,339)" style="opacity:1"><image href="${iconPath}/home-icon.png" x="0" y="0" width="160" height="160" preserveAspectRatio="xMidYMid meet"/></g>
-      <text id="fcLoadLabel" x="174" y="405" text-anchor="end" font-size="10" fill="#8b949e" letter-spacing=".5">Potrošnja kuće</text>
-      <text id="fcLoadVal" x="174" y="420" text-anchor="end" font-size="15" font-weight="700" fill="#F7F6D3">-- W</text>
+      <text id="fcLoadLabel" x="174" y="405" text-anchor="end" font-size="12" fill="#8b949e" letter-spacing=".5">Potrošnja kuće</text>
+      <text id="fcLoadVal" x="174" y="420" text-anchor="end" font-size="17" font-weight="700" fill="#F7F6D3">-- W</text>
       ${evtxt}
       </svg></div>`+
 
