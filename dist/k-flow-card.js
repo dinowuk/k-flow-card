@@ -1098,8 +1098,8 @@ class KFlowCard extends HTMLElement {
         <div style="flex:1;display:flex;align-items:center;gap:4px"><span style="font-size:.42rem;color:#8b949e;letter-spacing:1px;text-transform:uppercase">PV</span><div style="flex:1;display:flex;gap:2px;align-items:flex-end;height:10px" id="pvBlocks"></div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:5px">
-        <div class="st"><div class="l">POCETAK</div><div class="v" id="prodStart">--:--</div></div>
-        <div class="st"><div class="l">KRAJ</div><div class="v" id="prodEnd">--:--</div></div>
+        <div class="st"><div class="l">Početak proizvodnje</div><div class="v" id="prodStart">--:--</div></div>
+        <div class="st"><div class="l">Kraj proizvodnje</div><div class="v" id="prodEnd">--:--</div></div>
       </div>
       <div class="dv"></div>
       <div class="ct">☀️ Inverter</div>
